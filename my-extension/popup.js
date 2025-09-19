@@ -38,7 +38,7 @@ if ($signOutButton) {
 // 로그인 UI 표시
 function showLoginUI() {
   $user.innerHTML = "";
-  $btn.style.display = "block";
+  $btn.style.display = "flex";
   if ($mainContent) $mainContent.style.display = "none";
   if ($loginGuide) $loginGuide.style.display = "block";
   if ($signOutButton) $signOutButton.style.display = "none";
