@@ -1,4 +1,5 @@
 import { useAuth } from "../hooks/useAuth";
+import { logout } from "../firebase";
 import { Link } from "react-router-dom";
 import { Menu, Sun, Moon, Settings, User, LogOut, Globe } from "lucide-react";
 import { useDrawer } from "../contexts/DrawerContext";
@@ -9,7 +10,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ showMenuButton = false }: HeaderProps) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const { setIsDrawerOpen } = useDrawer();
 

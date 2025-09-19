@@ -48,8 +48,8 @@ read -p "Messaging Sender ID: " SENDER_ID
 echo ""
 log_info "설정 파일들을 생성하고 있습니다..."
 
-# React 앱 환경변수 파일 생성
-cat > my-app/.env.local << EOF
+# BookmarkHub Dashboard 환경변수 파일 생성
+cat > bookmarkhub-dashboard/.env.local << EOF
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=$API_KEY
 VITE_FIREBASE_AUTH_DOMAIN=$AUTH_DOMAIN
@@ -58,7 +58,7 @@ VITE_FIREBASE_APP_ID=$APP_ID
 VITE_FIREBASE_MESSAGING_SENDER_ID=$SENDER_ID
 EOF
 
-log_success "React 앱 환경변수 파일 생성됨: my-app/.env.local"
+log_success "BookmarkHub Dashboard 환경변수 파일 생성됨: bookmarkhub-dashboard/.env.local"
 
 # SignIn Popup 설정 파일 생성
 cat > signin-popup/config.js << EOF
@@ -91,8 +91,8 @@ log_success "Chrome Extension 설정 파일 생성됨: my-extension/firebase-con
 # Firebase 프로젝트 설정 파일 업데이트
 log_info "Firebase 프로젝트 설정 파일을 업데이트합니다..."
 
-# my-app/.firebaserc 업데이트
-cat > my-app/.firebaserc << EOF
+# bookmarkhub-dashboard/.firebaserc 업데이트
+cat > bookmarkhub-dashboard/.firebaserc << EOF
 {
   "projects": {
     "default": "$PROJECT_ID"

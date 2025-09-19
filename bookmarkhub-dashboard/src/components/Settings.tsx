@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { logout } from "../firebase";
 import { useBookmarks } from "../hooks/useBookmarks";
 import { useCollections } from "../hooks/useCollections";
 import { useNavigate } from "react-router-dom";
@@ -63,7 +64,7 @@ export const Settings: React.FC<SettingsProps> = ({
   onRestoreBackup,
   isRestoring = false,
 }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { bookmarks } = useBookmarks(user?.uid || "", "all");
   const { collections } = useCollections(user?.uid || "");
   const { theme, setTheme } = useTheme();

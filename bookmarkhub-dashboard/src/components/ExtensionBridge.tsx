@@ -1,12 +1,29 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { logout } from "../firebase";
 
 interface ExtensionBridgeProps {
   extensionId?: string;
 }
 
-export default function ExtensionBridge({ extensionId }: ExtensionBridgeProps) {
-  const { user, logout } = useAuth();
+// Chrome Extension API 타입 선언
+declare global {
+  interface Window {
+    chrome?: {
+      runtime?: {
+        sendMessage: (
+          extensionId: string,
+          message: any,
+          callback?: (response: any) => void
+        ) => void;
+        lastError?: { message: string };
+      };
+    };
+  }
+}
+
+export default function ExtensionBridge({}: ExtensionBridgeProps) {
+  const { user } = useAuth();
   const [isFromExtension, setIsFromExtension] = useState(false);
 
   useEffect(() => {
@@ -18,16 +35,20 @@ export default function ExtensionBridge({ extensionId }: ExtensionBridgeProps) {
     if (source === "extension" && extId) {
       setIsFromExtension(true);
 
-      // 이미 로그인된 상태라면 Extension에 알림
+      // 이미 로그인된 상태라면 Extension에 알림하고 자동으로 돌아가기
       if (user) {
         sendToExtension(extId, "LOGIN_SUCCESS", user);
+        // 1초 후 자동으로 창 닫기
+        setTimeout(() => {
+          window.close();
+        }, 1000);
       }
     }
   }, [user]);
 
   const sendToExtension = (extensionId: string, type: string, data?: any) => {
-    if (typeof chrome !== "undefined" && chrome.runtime) {
-      chrome.runtime.sendMessage(
+    if (typeof window !== "undefined" && window.chrome?.runtime) {
+      window.chrome.runtime.sendMessage(
         extensionId,
         {
           type,
@@ -40,11 +61,11 @@ export default function ExtensionBridge({ extensionId }: ExtensionBridgeProps) {
               }
             : undefined,
         },
-        (response) => {
-          if (chrome.runtime.lastError) {
+        (response: any) => {
+          if (window.chrome?.runtime?.lastError) {
             console.error(
               "Extension communication error:",
-              chrome.runtime.lastError
+              window.chrome.runtime.lastError
             );
           } else {
             console.log("Extension response:", response);
@@ -88,66 +109,30 @@ export default function ExtensionBridge({ extensionId }: ExtensionBridgeProps) {
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#e3f2fd",
-        padding: "12px",
-        borderBottom: "1px solid #90caf9",
-        zIndex: 1000,
-        textAlign: "center",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 600,
-          margin: "0 auto",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <span style={{ fontSize: "14px", color: "#1565c0" }}>
+    <div className="fixed top-0 left-0 right-0 bg-blue-50 dark:bg-blue-900/20 p-3 border-b border-blue-200 dark:border-blue-800 z-50 text-center">
+      <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <span className="text-sm text-blue-700 dark:text-blue-300">
           🔌 Chrome Extension에서 접속됨
         </span>
 
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="flex gap-2">
           {user ? (
             <>
               <button
                 onClick={handleBackToExtension}
-                style={{
-                  padding: "6px 12px",
-                  backgroundColor: "#1976d2",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                }}
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border-none rounded text-xs cursor-pointer transition-colors"
               >
                 Extension으로 돌아가기
               </button>
               <button
                 onClick={handleLogoutAndReturn}
-                style={{
-                  padding: "6px 12px",
-                  backgroundColor: "#d32f2f",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                }}
+                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white border-none rounded text-xs cursor-pointer transition-colors"
               >
                 로그아웃 후 돌아가기
               </button>
             </>
           ) : (
-            <span style={{ fontSize: "12px", color: "#1565c0" }}>
+            <span className="text-xs text-blue-700 dark:text-blue-300">
               로그인 후 자동으로 Extension으로 돌아갑니다
             </span>
           )}

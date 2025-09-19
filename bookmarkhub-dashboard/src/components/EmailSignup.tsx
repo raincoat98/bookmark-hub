@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { signupWithEmail } from "../lib/firebase";
+import { signupWithEmail } from "../firebase";
 
 interface EmailSignupProps {
   onSuccess?: () => void;
@@ -41,9 +41,9 @@ export default function EmailSignup({
     try {
       await signupWithEmail(email, password, displayName);
       onSuccess?.();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("회원가입 실패:", err);
-      setError(getErrorMessage(err.code));
+      setError(getErrorMessage((err as any).code));
     } finally {
       setLoading(false);
     }
@@ -79,32 +79,17 @@ export default function EmailSignup({
   const passwordStrength = getPasswordStrength(password);
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{ maxWidth: "400px", margin: "0 auto" }}
-    >
-      <h3 style={{ textAlign: "center", marginBottom: "24px" }}>✨ 회원가입</h3>
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+      <h3 className="text-center mb-6 text-lg font-semibold">✨ 회원가입</h3>
 
       {error && (
-        <div
-          style={{
-            backgroundColor: "#ffebee",
-            color: "#c62828",
-            padding: "12px",
-            borderRadius: "4px",
-            marginBottom: "16px",
-            fontSize: "14px",
-          }}
-        >
+        <div className="bg-red-50 text-red-800 p-3 rounded mb-4 text-sm">
           {error}
         </div>
       )}
 
-      <div style={{ marginBottom: "16px" }}>
-        <label
-          htmlFor="displayName"
-          style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}
-        >
+      <div className="mb-4">
+        <label htmlFor="displayName" className="block mb-2 font-medium">
           이름
         </label>
         <input
@@ -114,23 +99,13 @@ export default function EmailSignup({
           onChange={(e) => setDisplayName(e.target.value)}
           required
           disabled={loading}
-          style={{
-            width: "100%",
-            padding: "12px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
+          className="w-full p-3 border border-gray-300 rounded text-base box-border focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="홍길동"
         />
       </div>
 
-      <div style={{ marginBottom: "16px" }}>
-        <label
-          htmlFor="email"
-          style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}
-        >
+      <div className="mb-4">
+        <label htmlFor="email" className="block mb-2 font-medium">
           이메일
         </label>
         <input
@@ -140,23 +115,13 @@ export default function EmailSignup({
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={loading}
-          style={{
-            width: "100%",
-            padding: "12px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
+          className="w-full p-3 border border-gray-300 rounded text-base box-border focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="example@email.com"
         />
       </div>
 
-      <div style={{ marginBottom: "16px" }}>
-        <label
-          htmlFor="password"
-          style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}
-        >
+      <div className="mb-4">
+        <label htmlFor="password" className="block mb-2 font-medium">
           비밀번호
         </label>
         <input
@@ -166,34 +131,21 @@ export default function EmailSignup({
           onChange={(e) => setPassword(e.target.value)}
           required
           disabled={loading}
-          style={{
-            width: "100%",
-            padding: "12px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
+          className="w-full p-3 border border-gray-300 rounded text-base box-border focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="최소 6자 이상"
         />
         {password && (
           <div
-            style={{
-              fontSize: "12px",
-              marginTop: "4px",
-              color: passwordStrength.color,
-            }}
+            className="text-xs mt-1"
+            style={{ color: passwordStrength.color }}
           >
             비밀번호 강도: {passwordStrength.strength}
           </div>
         )}
       </div>
 
-      <div style={{ marginBottom: "16px" }}>
-        <label
-          htmlFor="confirmPassword"
-          style={{ display: "block", marginBottom: "8px", fontWeight: "500" }}
-        >
+      <div className="mb-4">
+        <label htmlFor="confirmPassword" className="block mb-2 font-medium">
           비밀번호 확인
         </label>
         <input
@@ -203,22 +155,15 @@ export default function EmailSignup({
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
           disabled={loading}
-          style={{
-            width: "100%",
-            padding: "12px",
-            border: `1px solid ${
-              confirmPassword && password !== confirmPassword
-                ? "#f44336"
-                : "#ddd"
-            }`,
-            borderRadius: "4px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
+          className={`w-full p-3 border rounded text-base box-border focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            confirmPassword && password !== confirmPassword
+              ? "border-red-500"
+              : "border-gray-300"
+          }`}
           placeholder="비밀번호를 다시 입력하세요"
         />
         {confirmPassword && password !== confirmPassword && (
-          <div style={{ fontSize: "12px", marginTop: "4px", color: "#f44336" }}>
+          <div className="text-xs mt-1 text-red-500">
             비밀번호가 일치하지 않습니다
           </div>
         )}
@@ -229,36 +174,19 @@ export default function EmailSignup({
         disabled={
           loading || !email.trim() || !password.trim() || !displayName.trim()
         }
-        style={{
-          width: "100%",
-          padding: "12px",
-          backgroundColor: loading ? "#ccc" : "#4caf50",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          fontSize: "16px",
-          fontWeight: "500",
-          cursor: loading ? "not-allowed" : "pointer",
-          marginBottom: "12px",
-        }}
+        className="w-full p-3 bg-green-600 text-white border-none rounded text-base font-medium cursor-pointer mb-3 disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
         {loading ? "회원가입 중..." : "회원가입"}
       </button>
 
-      <div style={{ textAlign: "center", fontSize: "14px" }}>
+      <div className="text-center text-sm">
         이미 계정이 있으신가요?{" "}
         {onSwitchToLogin && (
           <button
             type="button"
             onClick={onSwitchToLogin}
             disabled={loading}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#1976d2",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
+            className="bg-none border-none text-blue-700 cursor-pointer underline"
           >
             로그인
           </button>

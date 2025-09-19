@@ -1,6 +1,5 @@
-// src/contexts/AuthContext.tsx
 import { useEffect, useState } from "react";
-import { watchAuth } from "../lib/firebase";
+import { watchAuth } from "../firebase";
 import { AuthCtx, type AuthState } from "../hooks/useAuth";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

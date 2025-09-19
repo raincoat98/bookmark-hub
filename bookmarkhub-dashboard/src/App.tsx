@@ -20,8 +20,9 @@ import {
 import { useBookmarks } from "./hooks/useBookmarks";
 import { useCollections } from "./hooks/useCollections";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
-function App() {
+function AppContent() {
   const { user, loading } = useAuth();
   const [defaultPage, setDefaultPage] = useState<string | null>(null);
   const backupIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -151,6 +152,14 @@ function App() {
         />
       </Router>
     </ThemeProvider>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

@@ -159,16 +159,16 @@ dev_signin_popup() {
     python3 -m http.server $PORT
 }
 
-# React 앱 개발 서버 함수
-dev_my_app() {
-    log_info "⚛️  React 앱 개발 서버 시작..."
+# BookmarkHub Dashboard 개발 서버 함수
+dev_bookmarkhub_dashboard() {
+    log_info "⚛️  BookmarkHub Dashboard 개발 서버 시작..."
     
-    if [ ! -d "my-app" ]; then
-        log_error "my-app 디렉토리가 없습니다!"
+    if [ ! -d "bookmarkhub-dashboard" ]; then
+        log_error "bookmarkhub-dashboard 디렉토리가 없습니다!"
         return 1
     fi
     
-    cd my-app
+    cd bookmarkhub-dashboard
     
     # package.json 확인
     if [ ! -f "package.json" ]; then
@@ -186,7 +186,7 @@ dev_my_app() {
     # 포트 환경변수 설정
     export PORT=$PORT
     
-    log_success "React 앱 개발 서버를 시작합니다..."
+    log_success "BookmarkHub Dashboard 개발 서버를 시작합니다..."
     echo ""
     echo -e "${GREEN}🌐 예상 서버 URL: ${BLUE}http://localhost:$PORT${NC}"
     echo -e "${GREEN}📁 프로젝트 디렉토리: ${BLUE}$(pwd)${NC}"
@@ -252,7 +252,7 @@ dev_all() {
     echo ""
     echo -e "${YELLOW}여러 서버를 병렬로 실행합니다:${NC}"
     echo "- SignIn Popup: http://localhost:8000"
-    echo "- React App: http://localhost:3000" 
+    echo "- BookmarkHub Dashboard: http://localhost:3000" 
     echo "- Extension: Chrome Extension 로드 안내"
     echo ""
     
@@ -263,8 +263,8 @@ dev_all() {
     ) &
     
     (
-        echo "React 앱 서버 시작..."
-        cd my-app && npm run dev -- --port 3000 --host
+        echo "BookmarkHub Dashboard 서버 시작..."
+        cd bookmarkhub-dashboard && npm run dev -- --port 3000 --host
     ) &
     
     # Chrome Extension 안내
@@ -285,8 +285,8 @@ case $PROJECT in
     "signin-popup")
         dev_signin_popup
         ;;
-    "my-app")
-        dev_my_app
+    "bookmarkhub-dashboard")
+        dev_bookmarkhub_dashboard
         ;;
     "my-extension")
         dev_my_extension
@@ -296,7 +296,7 @@ case $PROJECT in
         ;;
     *)
         log_error "알 수 없는 프로젝트: $PROJECT"
-        log_info "사용 가능한 프로젝트: signin-popup, my-app, my-extension, all"
+        log_info "사용 가능한 프로젝트: signin-popup, bookmarkhub-dashboard, my-extension, all"
         exit 1
         ;;
 esac

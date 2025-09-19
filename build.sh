@@ -93,15 +93,15 @@ build_signin_popup() {
 }
 
 # React 앱 빌드 함수
-build_my_app() {
-    log_info "⚛️  React 앱 빌드 시작..."
+build_bookmarkhub_dashboard() {
+    log_info "⚛️  BookmarkHub Dashboard 빌드 시작..."
     
-    if [ ! -d "my-app" ]; then
-        log_error "my-app 디렉토리가 없습니다!"
+    if [ ! -d "bookmarkhub-dashboard" ]; then
+        log_error "bookmarkhub-dashboard 디렉토리가 없습니다!"
         return 1
     fi
     
-    cd my-app
+    cd bookmarkhub-dashboard
     
     # package.json 확인
     if [ ! -f "package.json" ]; then
@@ -139,7 +139,7 @@ build_my_app() {
     # 빌드 실행
     log_info "React 앱 빌드 중..."
     if npm run build; then
-        log_success "React 앱 빌드 완료!"
+        log_success "BookmarkHub Dashboard 빌드 완료!"
         
         # 빌드 결과 확인
         if [ -d "dist" ]; then
@@ -154,7 +154,7 @@ build_my_app() {
             log_warning "dist 디렉토리를 찾을 수 없습니다"
         fi
     else
-        log_error "React 앱 빌드 실패!"
+        log_error "BookmarkHub Dashboard 빌드 실패!"
         cd "$ROOT_DIR"
         return 1
     fi
@@ -251,8 +251,8 @@ case $PROJECT in
     "signin-popup")
         build_signin_popup
         ;;
-    "my-app")
-        build_my_app
+    "bookmarkhub-dashboard")
+        build_bookmarkhub_dashboard
         ;;
     "my-extension")
         build_my_extension
@@ -268,7 +268,7 @@ case $PROJECT in
         fi
         
         echo ""
-        if build_my_app; then
+        if build_bookmarkhub_dashboard; then
             SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
         fi
         
@@ -288,12 +288,12 @@ case $PROJECT in
         echo ""
         echo -e "${BLUE}📋 빌드 결과 요약:${NC}"
         [ -d "signin-popup" ] && echo "• SignIn Popup: 정적 파일 (배포 준비됨)"
-        [ -d "my-app/dist" ] && echo "• React App: my-app/dist/ (호스팅 준비됨)"
+        [ -d "bookmarkhub-dashboard/dist" ] && echo "• BookmarkHub Dashboard: bookmarkhub-dashboard/dist/ (호스팅 준비됨)"
         [ -f "build/my-extension-"*.zip ] && echo "• Chrome Extension: build/my-extension-*.zip (스토어 업로드 준비됨)"
         ;;
     *)
         log_error "알 수 없는 프로젝트: $PROJECT"
-        log_info "사용 가능한 프로젝트: signin-popup, my-app, my-extension, all"
+        log_info "사용 가능한 프로젝트: signin-popup, bookmarkhub-dashboard, my-extension, all"
         exit 1
         ;;
 esac
