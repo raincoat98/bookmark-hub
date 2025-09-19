@@ -4,6 +4,12 @@ import { useAuth } from "../hooks/useAuth";
 import { toast } from "react-hot-toast";
 import ExtensionBridge from "./ExtensionBridge";
 
+// Firebase 에러 타입 정의
+interface FirebaseError {
+  code: string;
+  message: string;
+}
+
 export const LoginScreen = () => {
   const { loading } = useAuth();
   const [isSignup, setIsSignup] = useState(false);
@@ -30,12 +36,23 @@ export const LoginScreen = () => {
       setFormLoading(true);
       await loginWithGoogle();
     } catch (error: unknown) {
-      if ((error as any).code === "auth/popup-closed-by-user") {
-        toast.error("로그인이 취소되었습니다.");
-      } else if ((error as any).code === "auth/popup-blocked") {
-        toast.error("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
-      } else if ((error as any).code === "auth/cancelled-popup-request") {
-        toast.error("로그인 요청이 취소되었습니다.");
+      const firebaseError = error as FirebaseError;
+
+      if (firebaseError?.code) {
+        switch (firebaseError.code) {
+          case "auth/popup-closed-by-user":
+            toast.error("로그인이 취소되었습니다.");
+            break;
+          case "auth/popup-blocked":
+            toast.error("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
+            break;
+          case "auth/cancelled-popup-request":
+            toast.error("로그인 요청이 취소되었습니다.");
+            break;
+          default:
+            console.error("Google login error:", error);
+            toast.error("Google 로그인에 실패했습니다. 다시 시도해주세요.");
+        }
       } else {
         console.error("Google login error:", error);
         toast.error("Google 로그인에 실패했습니다. 다시 시도해주세요.");
@@ -69,25 +86,32 @@ export const LoginScreen = () => {
         );
         toast.success("가입이 완료되었습니다!");
       } catch (error: unknown) {
-        if ((error as any).code === "auth/email-already-in-use") {
-          toast.error("이미 가입된 이메일입니다. 로그인해주세요.");
-          // 로그인 모드로 전환
-          setIsSignup(false);
-          // 비밀번호만 초기화
-          setFormData((prev) => ({
-            ...prev,
-            password: "",
-            confirmPassword: "",
-          }));
-        } else if ((error as any).code === "auth/weak-password") {
-          toast.error("비밀번호는 최소 6자 이상이어야 합니다.");
-        } else if ((error as any).code === "auth/invalid-email") {
-          toast.error("올바른 이메일 형식이 아닙니다.");
-        } else if ((error as any).code === "auth/operation-not-allowed") {
-          toast.error("이메일/비밀번호 가입이 비활성화되어 있습니다.");
-        } else {
-          console.error("Signup error:", error);
-          toast.error("가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+        const firebaseError = error as FirebaseError;
+
+        switch (firebaseError?.code) {
+          case "auth/email-already-in-use":
+            toast.error("이미 가입된 이메일입니다. 로그인해주세요.");
+            // 로그인 모드로 전환
+            setIsSignup(false);
+            // 비밀번호만 초기화
+            setFormData((prev) => ({
+              ...prev,
+              password: "",
+              confirmPassword: "",
+            }));
+            break;
+          case "auth/weak-password":
+            toast.error("비밀번호는 최소 6자 이상이어야 합니다.");
+            break;
+          case "auth/invalid-email":
+            toast.error("올바른 이메일 형식이 아닙니다.");
+            break;
+          case "auth/operation-not-allowed":
+            toast.error("이메일/비밀번호 가입이 비활성화되어 있습니다.");
+            break;
+          default:
+            console.error("Signup error:", error);
+            toast.error("가입 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
       } finally {
         setFormLoading(false);
@@ -98,28 +122,36 @@ export const LoginScreen = () => {
         setFormLoading(true);
         await loginWithEmail(formData.email, formData.password);
       } catch (error: unknown) {
-        if ((error as any).code === "auth/user-not-found") {
-          toast.error("등록되지 않은 이메일입니다. 가입해주세요.");
-          // 가입 모드로 전환
-          setIsSignup(true);
-        } else if ((error as any).code === "auth/wrong-password") {
-          toast.error("비밀번호가 올바르지 않습니다.");
-          // 비밀번호만 초기화
-          setFormData((prev) => ({
-            ...prev,
-            password: "",
-          }));
-        } else if ((error as any).code === "auth/invalid-email") {
-          toast.error("올바른 이메일 형식이 아닙니다.");
-        } else if ((error as any).code === "auth/too-many-requests") {
-          toast.error(
-            "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요."
-          );
-        } else if ((error as any).code === "auth/user-disabled") {
-          toast.error("비활성화된 계정입니다.");
-        } else {
-          console.error("Login error:", error);
-          toast.error("로그인에 실패했습니다. 다시 시도해주세요.");
+        const firebaseError = error as FirebaseError;
+
+        switch (firebaseError?.code) {
+          case "auth/user-not-found":
+            toast.error("등록되지 않은 이메일입니다. 가입해주세요.");
+            // 가입 모드로 전환
+            setIsSignup(true);
+            break;
+          case "auth/wrong-password":
+            toast.error("비밀번호가 올바르지 않습니다.");
+            // 비밀번호만 초기화
+            setFormData((prev) => ({
+              ...prev,
+              password: "",
+            }));
+            break;
+          case "auth/invalid-email":
+            toast.error("올바른 이메일 형식이 아닙니다.");
+            break;
+          case "auth/too-many-requests":
+            toast.error(
+              "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요."
+            );
+            break;
+          case "auth/user-disabled":
+            toast.error("비활성화된 계정입니다.");
+            break;
+          default:
+            console.error("Login error:", error);
+            toast.error("로그인에 실패했습니다. 다시 시도해주세요.");
         }
       } finally {
         setFormLoading(false);
